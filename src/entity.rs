@@ -1,6 +1,7 @@
 /// Entity system for fighters and other game objects
 /// Combines state machine, physics, and collision
 
+use crate::constants::*;
 use crate::types::{Vec2, EntityId, PlayerId, Facing};
 use crate::state::{StateMachine, StateId, StateAction, states};
 use crate::hitbox::{CollisionBox, CollisionResult};
@@ -50,7 +51,7 @@ impl Physics {
             position,
             velocity: Vec2::ZERO,
             momentum: Vec2::ZERO,
-            gravity: 80,
+            gravity: GRAVITY,
             on_ground: true,
         }
     }
@@ -61,8 +62,8 @@ impl Physics {
         self.position = self.position.add(self.momentum);
 
         // Decay momentum
-        self.momentum.x = self.momentum.x * 90 / 100;
-        self.momentum.y = self.momentum.y * 90 / 100;
+        self.momentum.x = self.momentum.x * MOMENTUM_DECAY_PERCENT / MOMENTUM_DECAY_DIVISOR;
+        self.momentum.y = self.momentum.y * MOMENTUM_DECAY_PERCENT / MOMENTUM_DECAY_DIVISOR;
 
         // Apply velocity (from movement)
         self.position = self.position.add(self.velocity);
@@ -91,7 +92,7 @@ impl Physics {
         self.momentum.y += y;
 
         // Launch into air if significant upward momentum
-        if y < -100 {
+        if y < KNOCKBACK_THRESHOLD {
             self.on_ground = false;
         }
     }
