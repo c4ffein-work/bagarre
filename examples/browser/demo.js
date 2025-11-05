@@ -257,49 +257,45 @@ function render() {
 
 // Keyboard input
 function handleKeyDown(e) {
-    // Player 1 (WASD + JKLU)
+    // Player 1 (WASD + 123)
     if (e.key === 'w' || e.key === 'W') p1Input.up = true;
     if (e.key === 's' || e.key === 'S') p1Input.down = true;
     if (e.key === 'a' || e.key === 'A') p1Input.left = true;
     if (e.key === 'd' || e.key === 'D') p1Input.right = true;
-    if (e.key === 'j' || e.key === 'J') p1Input.light = true;
-    if (e.key === 'k' || e.key === 'K') p1Input.medium = true;
-    if (e.key === 'l' || e.key === 'L') p1Input.heavy = true;
-    if (e.key === 'u' || e.key === 'U') p1Input.special = true;
+    if (e.key === '1') p1Input.light = true;
+    if (e.key === '2') p1Input.medium = true;
+    if (e.key === '3') p1Input.heavy = true;
 
-    // Player 2 (Arrows + 1230)
+    // Player 2 (Arrows + 890)
     if (e.key === 'ArrowUp') p2Input.up = true;
     if (e.key === 'ArrowDown') p2Input.down = true;
     if (e.key === 'ArrowLeft') p2Input.left = true;
     if (e.key === 'ArrowRight') p2Input.right = true;
-    if (e.key === '1') p2Input.light = true;
-    if (e.key === '2') p2Input.medium = true;
-    if (e.key === '3') p2Input.heavy = true;
-    if (e.key === '0') p2Input.special = true;
+    if (e.key === '8') p2Input.light = true;
+    if (e.key === '9') p2Input.medium = true;
+    if (e.key === '0') p2Input.heavy = true;
 
     e.preventDefault();
 }
 
 function handleKeyUp(e) {
-    // Player 1
+    // Player 1 (WASD + 123)
     if (e.key === 'w' || e.key === 'W') p1Input.up = false;
     if (e.key === 's' || e.key === 'S') p1Input.down = false;
     if (e.key === 'a' || e.key === 'A') p1Input.left = false;
     if (e.key === 'd' || e.key === 'D') p1Input.right = false;
-    if (e.key === 'j' || e.key === 'J') p1Input.light = false;
-    if (e.key === 'k' || e.key === 'K') p1Input.medium = false;
-    if (e.key === 'l' || e.key === 'L') p1Input.heavy = false;
-    if (e.key === 'u' || e.key === 'U') p1Input.special = false;
+    if (e.key === '1') p1Input.light = false;
+    if (e.key === '2') p1Input.medium = false;
+    if (e.key === '3') p1Input.heavy = false;
 
-    // Player 2
+    // Player 2 (Arrows + 890)
     if (e.key === 'ArrowUp') p2Input.up = false;
     if (e.key === 'ArrowDown') p2Input.down = false;
     if (e.key === 'ArrowLeft') p2Input.left = false;
     if (e.key === 'ArrowRight') p2Input.right = false;
-    if (e.key === '1') p2Input.light = false;
-    if (e.key === '2') p2Input.medium = false;
-    if (e.key === '3') p2Input.heavy = false;
-    if (e.key === '0') p2Input.special = false;
+    if (e.key === '8') p2Input.light = false;
+    if (e.key === '9') p2Input.medium = false;
+    if (e.key === '0') p2Input.heavy = false;
 
     e.preventDefault();
 }
