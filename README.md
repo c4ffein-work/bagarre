@@ -94,36 +94,46 @@ All 23 tests should pass:
 
 ## 🌐 WASM Browser Build
 
+### 🎮 Live Demo
+
+**[Try it live on GitHub Pages!](https://c4ffein-work.github.io/bagarre/)** _(Auto-deployed on every push to main)_
+
 ### Prerequisites
 
 ```bash
 # Install WASM target
 rustup target add wasm32-unknown-unknown
-
-# Optional: Install wasm-bindgen for easier JS interop
-cargo install wasm-bindgen-cli
 ```
 
 ### Build for WASM
 
 ```bash
-# Build the WASM module
-cargo build --target wasm32-unknown-unknown --release
+# Use the build script (recommended)
+./build-wasm.sh
 
-# The WASM file will be at:
-# target/wasm32-unknown-unknown/release/bagarre.wasm
+# Or build manually:
+cargo build --target wasm32-unknown-unknown --release
+# Copy to browser demo:
+cp target/wasm32-unknown-unknown/release/bagarre.wasm examples/browser/
 ```
 
-### Run Browser Demo
+### Run Browser Demo Locally
 
 ```bash
-# Serve the example (requires a local server)
+# Build WASM first
+./build-wasm.sh
+
+# Serve the demo (requires a local server)
 cd examples/browser
-python -m http.server 8000
+python3 -m http.server 8000
 # Open http://localhost:8000
 ```
 
-**Note:** The browser demo currently runs in simulation mode. For full WASM integration, you'll need to use `wasm-bindgen` or manually load the WASM module.
+**Controls:**
+- **Player 1:** WASD (move) + J/K/L (Light/Medium/Heavy) + U (Special)
+- **Player 2:** Arrow Keys (move) + 1/2/3 (Light/Medium/Heavy) + 0 (Special)
+
+The browser demo uses direct WASM loading without wasm-bindgen for true zero-dependency builds!
 
 ## 🎮 Core Systems
 
