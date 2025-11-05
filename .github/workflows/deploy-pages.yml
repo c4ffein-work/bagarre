@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: CI/CD - Test, Lint, and Deploy
 
 on:
   push:
@@ -27,6 +27,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
 
       - name: Cache Cargo
         uses: actions/cache@v3
@@ -38,6 +39,24 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check Formatting
+        run: |
+          echo "🎨 Checking code formatting..."
+          cargo fmt --check
+          echo "✅ Code formatting is correct"
+
+      - name: Run Clippy
+        run: |
+          echo "📎 Running Clippy linter..."
+          cargo clippy --all-targets --all-features -- -D warnings
+          echo "✅ Clippy checks passed"
+
+      - name: Run Tests
+        run: |
+          echo "🧪 Running test suite..."
+          cargo test --verbose
+          echo "✅ All tests passed"
 
       - name: Build WASM
         run: |
