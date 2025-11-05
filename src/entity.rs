@@ -1,11 +1,11 @@
-/// Entity system for fighters and other game objects
-/// Combines state machine, physics, and collision
+//! Entity system for fighters and other game objects
+//! Combines state machine, physics, and collision
 
 use crate::constants::*;
-use crate::types::{Vec2, EntityId, PlayerId, Facing};
-use crate::state::{StateMachine, StateId, StateAction, states};
 use crate::hitbox::{CollisionBox, CollisionResult};
 use crate::input::InputBuffer;
+use crate::state::{states, StateAction, StateId, StateMachine};
+use crate::types::{EntityId, Facing, PlayerId, Vec2};
 
 /// Health and damage tracking
 #[derive(Debug, Clone, Copy)]
@@ -40,8 +40,8 @@ impl Health {
 pub struct Physics {
     pub position: Vec2,
     pub velocity: Vec2,
-    pub momentum: Vec2,      // Knockback/hitstun momentum
-    pub gravity: i32,        // Applied each frame when airborne
+    pub momentum: Vec2, // Knockback/hitstun momentum
+    pub gravity: i32,   // Applied each frame when airborne
     pub on_ground: bool,
 }
 
@@ -230,22 +230,20 @@ impl Entity {
     fn execute_state_actions(&mut self) {
         let actions = self.state_machine.get_current_actions();
 
-        for action_opt in &actions {
-            if let Some(action) = action_opt {
-                match action {
-                    StateAction::SetVelocity { x, y } => {
-                        self.physics.velocity.x = x * self.facing.sign();
-                        self.physics.velocity.y = *y;
-                    }
-                    StateAction::AddMomentum { x, y } => {
-                        self.physics.momentum.x += x * self.facing.sign();
-                        self.physics.momentum.y += y;
-                    }
-                    StateAction::Transition { target } => {
-                        self.state_machine.transition(*target);
-                    }
-                    _ => {}
+        for action in actions.iter().flatten() {
+            match action {
+                StateAction::SetVelocity { x, y } => {
+                    self.physics.velocity.x = x * self.facing.sign();
+                    self.physics.velocity.y = *y;
                 }
+                StateAction::AddMomentum { x, y } => {
+                    self.physics.momentum.x += x * self.facing.sign();
+                    self.physics.momentum.y += y;
+                }
+                StateAction::Transition { target } => {
+                    self.state_machine.transition(*target);
+                }
+                _ => {}
             }
         }
     }
@@ -257,7 +255,14 @@ impl Entity {
 
         let actions = self.state_machine.get_current_actions();
         for action_opt in &actions {
-            if let Some(StateAction::Hitbox { x, y, width, height, attack }) = action_opt {
+            if let Some(StateAction::Hitbox {
+                x,
+                y,
+                width,
+                height,
+                attack,
+            }) = action_opt
+            {
                 if count < 4 {
                     let mut bounds = crate::types::Rect::new(*x, *y, *width, *height);
 
@@ -267,11 +272,8 @@ impl Entity {
                     }
 
                     hitboxes[count] = Some(
-                        CollisionBox::hitbox(
-                            self.id,
-                            bounds,
-                            *attack,
-                        ).translate(self.physics.position)
+                        CollisionBox::hitbox(self.id, bounds, *attack)
+                            .translate(self.physics.position),
                     );
                     count += 1;
                 }
@@ -285,8 +287,7 @@ impl Entity {
     pub fn get_hurtboxes(&self) -> [Option<CollisionBox>; 2] {
         // Default body hurtbox
         let body_box = crate::types::Rect::new(0, 0, 10000, 25000);
-        let hurtbox = CollisionBox::hurtbox(self.id, body_box)
-            .translate(self.physics.position);
+        let hurtbox = CollisionBox::hurtbox(self.id, body_box).translate(self.physics.position);
 
         [Some(hurtbox), None]
     }
@@ -301,10 +302,8 @@ impl Entity {
             self.state_machine.transition(StateId::Blockstun);
 
             // Reduced pushback when blocking
-            self.physics.apply_knockback(
-                attack.pushback_x / 2 * -self.facing.sign(),
-                0,
-            );
+            self.physics
+                .apply_knockback(attack.pushback_x / 2 * -self.facing.sign(), 0);
         } else {
             // Hit
             self.health.take_damage(attack.damage);
@@ -312,10 +311,8 @@ impl Entity {
             self.state_machine.transition(StateId::Hitstun);
 
             // Full knockback
-            self.physics.apply_knockback(
-                attack.pushback_x * -self.facing.sign(),
-                attack.pushback_y,
-            );
+            self.physics
+                .apply_knockback(attack.pushback_x * -self.facing.sign(), attack.pushback_y);
         }
     }
 
@@ -343,11 +340,7 @@ mod tests {
 
     #[test]
     fn test_entity_creation() {
-        let entity = Entity::new(
-            EntityId(0),
-            PlayerId::PLAYER_1,
-            Vec2::new(0, 0),
-        );
+        let entity = Entity::new(EntityId(0), PlayerId::PLAYER_1, Vec2::new(0, 0));
 
         assert_eq!(entity.health.current, 1000);
         assert_eq!(entity.facing, Facing::Right);
@@ -382,11 +375,7 @@ mod tests {
 
     #[test]
     fn test_facing_update() {
-        let mut entity = Entity::new(
-            EntityId(0),
-            PlayerId::PLAYER_1,
-            Vec2::new(0, 0),
-        );
+        let mut entity = Entity::new(EntityId(0), PlayerId::PLAYER_1, Vec2::new(0, 0));
 
         entity.update_facing(Vec2::new(1000, 0));
         assert_eq!(entity.facing, Facing::Right);

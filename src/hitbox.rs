@@ -1,8 +1,8 @@
-/// Hitbox and hurtbox system for collision detection
-/// Inspired by Castagne's attack/defense collision model
+//! Hitbox and hurtbox system for collision detection
+//! Inspired by Castagne's attack/defense collision model
 
 use crate::constants::*;
-use crate::types::{Rect, Vec2, EntityId};
+use crate::types::{EntityId, Rect, Vec2};
 
 /// Type of collision box
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,13 +19,13 @@ pub enum BoxType {
 #[derive(Debug, Clone, Copy)]
 pub struct AttackData {
     pub damage: i32,
-    pub hitstun: u32,       // Frames of hitstun on hit
-    pub blockstun: u32,     // Frames of blockstun if blocked
-    pub pushback_x: i32,    // Horizontal knockback
-    pub pushback_y: i32,    // Vertical knockback (for launchers)
-    pub can_block: bool,    // Is this blockable?
-    pub is_overhead: bool,  // Must block standing
-    pub is_low: bool,       // Must block crouching
+    pub hitstun: u32,      // Frames of hitstun on hit
+    pub blockstun: u32,    // Frames of blockstun if blocked
+    pub pushback_x: i32,   // Horizontal knockback
+    pub pushback_y: i32,   // Vertical knockback (for launchers)
+    pub can_block: bool,   // Is this blockable?
+    pub is_overhead: bool, // Must block standing
+    pub is_low: bool,      // Must block crouching
 }
 
 impl AttackData {
@@ -136,6 +136,12 @@ pub struct CollisionSystem {
     hurt_count: usize,
 }
 
+impl Default for CollisionSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CollisionSystem {
     pub fn new() -> Self {
         Self {
@@ -222,9 +228,7 @@ mod tests {
 
     #[test]
     fn test_attack_data_builder() {
-        let attack = AttackData::new(100)
-            .with_knockback(1000, 500)
-            .unblockable();
+        let attack = AttackData::new(100).with_knockback(1000, 500).unblockable();
 
         assert_eq!(attack.damage, 100);
         assert_eq!(attack.pushback_x, 1000);
@@ -240,16 +244,10 @@ mod tests {
         let defender_id = EntityId(1);
 
         // Create overlapping boxes
-        let hitbox = CollisionBox::hitbox(
-            attacker_id,
-            Rect::new(10, 10, 20, 20),
-            AttackData::new(100),
-        );
+        let hitbox =
+            CollisionBox::hitbox(attacker_id, Rect::new(10, 10, 20, 20), AttackData::new(100));
 
-        let hurtbox = CollisionBox::hurtbox(
-            defender_id,
-            Rect::new(15, 15, 20, 20),
-        );
+        let hurtbox = CollisionBox::hurtbox(defender_id, Rect::new(15, 15, 20, 20));
 
         system.add_hitbox(hitbox);
         system.add_hurtbox(hurtbox);
@@ -268,16 +266,10 @@ mod tests {
         let mut system = CollisionSystem::new();
         let entity_id = EntityId(0);
 
-        let hitbox = CollisionBox::hitbox(
-            entity_id,
-            Rect::new(10, 10, 20, 20),
-            AttackData::new(100),
-        );
+        let hitbox =
+            CollisionBox::hitbox(entity_id, Rect::new(10, 10, 20, 20), AttackData::new(100));
 
-        let hurtbox = CollisionBox::hurtbox(
-            entity_id,
-            Rect::new(15, 15, 20, 20),
-        );
+        let hurtbox = CollisionBox::hurtbox(entity_id, Rect::new(15, 15, 20, 20));
 
         system.add_hitbox(hitbox);
         system.add_hurtbox(hurtbox);

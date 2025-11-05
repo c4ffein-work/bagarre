@@ -1,5 +1,5 @@
-/// State machine system for character states
-/// Each state has frame data and can transition to other states
+//! State machine system for character states
+//! Each state has frame data and can transition to other states
 
 use crate::constants::*;
 use crate::hitbox::AttackData;
@@ -46,19 +46,11 @@ pub enum StateAction {
         attack: AttackData,
     },
     /// Set velocity
-    SetVelocity {
-        x: i32,
-        y: i32,
-    },
+    SetVelocity { x: i32, y: i32 },
     /// Add momentum
-    AddMomentum {
-        x: i32,
-        y: i32,
-    },
+    AddMomentum { x: i32, y: i32 },
     /// Transition to another state
-    Transition {
-        target: StateId,
-    },
+    Transition { target: StateId },
     /// No action
     None,
 }
@@ -81,8 +73,8 @@ impl FrameData {
 pub struct State {
     pub id: StateId,
     pub state_type: StateType,
-    pub duration: u32,          // Total frames
-    pub can_cancel: bool,       // Can cancel to other states?
+    pub duration: u32,                                             // Total frames
+    pub can_cancel: bool,                                          // Can cancel to other states?
     pub frame_data: [Option<FrameData>; MAX_FRAME_DATA_PER_STATE], // Frame-specific actions
     pub frame_data_count: usize,
 }
@@ -134,9 +126,15 @@ impl State {
 /// State machine that tracks current state and transitions
 pub struct StateMachine {
     current_state: StateId,
-    state_frame: u32,        // Current frame within the state
+    state_frame: u32, // Current frame within the state
     states: [Option<State>; MAX_STATES],
     state_count: usize,
+}
+
+impl Default for StateMachine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl StateMachine {
@@ -236,36 +234,39 @@ pub mod states {
     pub fn light_attack() -> State {
         State::new(StateId::LightAttack, StateType::Attack, 18)
             .with_cancel()
-            .add_frame_data(FrameData::new(5, StateAction::Hitbox {
-                x: 15000,
-                y: 10000,
-                width: 12000,
-                height: 8000,
-                attack: AttackData::new(50)
-                    .with_stun(8, 6)
-                    .with_knockback(400, 0),
-            }))
+            .add_frame_data(FrameData::new(
+                5,
+                StateAction::Hitbox {
+                    x: 15000,
+                    y: 10000,
+                    width: 12000,
+                    height: 8000,
+                    attack: AttackData::new(50).with_stun(8, 6).with_knockback(400, 0),
+                },
+            ))
     }
 
     /// Create medium attack (balanced)
     pub fn medium_attack() -> State {
         State::new(StateId::MediumAttack, StateType::Attack, 24)
             .with_cancel()
-            .add_frame_data(FrameData::new(8, StateAction::Hitbox {
-                x: 18000,
-                y: 10000,
-                width: 15000,
-                height: 10000,
-                attack: AttackData::new(100)
-                    .with_stun(12, 8)
-                    .with_knockback(800, 0),
-            }))
+            .add_frame_data(FrameData::new(
+                8,
+                StateAction::Hitbox {
+                    x: 18000,
+                    y: 10000,
+                    width: 15000,
+                    height: 10000,
+                    attack: AttackData::new(100).with_stun(12, 8).with_knockback(800, 0),
+                },
+            ))
     }
 
     /// Create heavy attack (slow, high damage)
     pub fn heavy_attack() -> State {
-        State::new(StateId::HeavyAttack, StateType::Attack, 36)
-            .add_frame_data(FrameData::new(12, StateAction::Hitbox {
+        State::new(StateId::HeavyAttack, StateType::Attack, 36).add_frame_data(FrameData::new(
+            12,
+            StateAction::Hitbox {
                 x: 20000,
                 y: 10000,
                 width: 18000,
@@ -273,7 +274,8 @@ pub mod states {
                 attack: AttackData::new(200)
                     .with_stun(18, 12)
                     .with_knockback(1500, -500), // Launcher
-            }))
+            },
+        ))
     }
 
     /// Create hitstun state

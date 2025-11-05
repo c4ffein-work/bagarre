@@ -1,11 +1,11 @@
-/// Main game engine - ties together all systems
-/// Inspired by Castagne's phase-based execution model
+//! Main game engine - ties together all systems
+//! Inspired by Castagne's phase-based execution model
 
 use crate::constants::*;
-use crate::types::{Vec2, EntityId, PlayerId, Frame};
 use crate::entity::Entity;
-use crate::hitbox::{CollisionSystem, CollisionResult};
+use crate::hitbox::{CollisionResult, CollisionSystem};
 use crate::input::{InputManager, InputState};
+use crate::types::{EntityId, Frame, PlayerId, Vec2};
 
 /// Game result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,6 +26,12 @@ pub struct Engine {
     pub game_result: GameResult,
 }
 
+impl Default for Engine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Engine {
     pub fn new() -> Self {
         Self {
@@ -41,18 +47,10 @@ impl Engine {
     /// Initialize a standard 2-player match
     pub fn init_match(&mut self) {
         // Player 1 on left
-        let p1 = Entity::new(
-            EntityId(0),
-            PlayerId::PLAYER_1,
-            Vec2::new(-50000, 0),
-        );
+        let p1 = Entity::new(EntityId(0), PlayerId::PLAYER_1, Vec2::new(-50000, 0));
 
         // Player 2 on right
-        let p2 = Entity::new(
-            EntityId(1),
-            PlayerId::PLAYER_2,
-            Vec2::new(50000, 0),
-        );
+        let p2 = Entity::new(EntityId(1), PlayerId::PLAYER_2, Vec2::new(50000, 0));
 
         self.entities[0] = Some(p1);
         self.entities[1] = Some(p2);
@@ -112,18 +110,14 @@ impl Engine {
             if let Some(entity) = &self.entities[i] {
                 // Add hitboxes
                 let hitboxes = entity.get_hitboxes();
-                for hitbox_opt in &hitboxes {
-                    if let Some(hitbox) = hitbox_opt {
-                        self.collision_system.add_hitbox(*hitbox);
-                    }
+                for hitbox in hitboxes.iter().flatten() {
+                    self.collision_system.add_hitbox(*hitbox);
                 }
 
                 // Add hurtboxes
                 let hurtboxes = entity.get_hurtboxes();
-                for hurtbox_opt in &hurtboxes {
-                    if let Some(hurtbox) = hurtbox_opt {
-                        self.collision_system.add_hurtbox(*hurtbox);
-                    }
+                for hurtbox in hurtboxes.iter().flatten() {
+                    self.collision_system.add_hurtbox(*hurtbox);
                 }
             }
         }
@@ -133,10 +127,8 @@ impl Engine {
     fn resolve_hits(&mut self) {
         let collisions = self.collision_system.check_collisions();
 
-        for collision_opt in &collisions {
-            if let Some(collision) = collision_opt {
-                self.apply_hit(collision);
-            }
+        for collision in collisions.iter().flatten() {
+            self.apply_hit(collision);
         }
     }
 
@@ -144,7 +136,9 @@ impl Engine {
     fn apply_hit(&mut self, collision: &CollisionResult) {
         // Find defender
         let defender_idx = self.find_entity_index(collision.defender);
-        let Some(defender_idx) = defender_idx else { return };
+        let Some(defender_idx) = defender_idx else {
+            return;
+        };
 
         // Check if defender is blocking
         let is_blocking = {
@@ -193,8 +187,14 @@ impl Engine {
             return;
         }
 
-        let p1_alive = self.entities[0].as_ref().map(|e| e.health.is_alive()).unwrap_or(false);
-        let p2_alive = self.entities[1].as_ref().map(|e| e.health.is_alive()).unwrap_or(false);
+        let p1_alive = self.entities[0]
+            .as_ref()
+            .map(|e| e.health.is_alive())
+            .unwrap_or(false);
+        let p2_alive = self.entities[1]
+            .as_ref()
+            .map(|e| e.health.is_alive())
+            .unwrap_or(false);
 
         self.game_result = match (p1_alive, p2_alive) {
             (true, true) => GameResult::InProgress,
@@ -248,11 +248,15 @@ impl Engine {
             frame: self.frame.0,
             p1_pos: p1.map(|e| e.physics.position).unwrap_or(Vec2::ZERO),
             p1_health: p1.map(|e| e.health.current).unwrap_or(0),
-            p1_state: p1.map(|e| state_to_string(e.state_machine.current_state())).unwrap_or("Unknown"),
+            p1_state: p1
+                .map(|e| state_to_string(e.state_machine.current_state()))
+                .unwrap_or("Unknown"),
             p1_facing: p1.map(|e| e.facing).unwrap_or(crate::types::Facing::Right),
             p2_pos: p2.map(|e| e.physics.position).unwrap_or(Vec2::ZERO),
             p2_health: p2.map(|e| e.health.current).unwrap_or(0),
-            p2_state: p2.map(|e| state_to_string(e.state_machine.current_state())).unwrap_or("Unknown"),
+            p2_state: p2
+                .map(|e| state_to_string(e.state_machine.current_state()))
+                .unwrap_or("Unknown"),
             p2_facing: p2.map(|e| e.facing).unwrap_or(crate::types::Facing::Left),
             result: self.game_result,
         }

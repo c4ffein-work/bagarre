@@ -1,5 +1,5 @@
-/// Input system with motion detection for fighting games
-/// Supports directional inputs, buttons, and special move motions
+//! Input system with motion detection for fighting games
+//! Supports directional inputs, buttons, and special move motions
 
 use crate::constants::*;
 use crate::types::Facing;
@@ -54,19 +54,31 @@ impl Direction {
     }
 
     pub fn is_down(&self) -> bool {
-        matches!(self, Direction::Down | Direction::DownBack | Direction::DownForward)
+        matches!(
+            self,
+            Direction::Down | Direction::DownBack | Direction::DownForward
+        )
     }
 
     pub fn is_up(&self) -> bool {
-        matches!(self, Direction::Up | Direction::UpBack | Direction::UpForward)
+        matches!(
+            self,
+            Direction::Up | Direction::UpBack | Direction::UpForward
+        )
     }
 
     pub fn is_back(&self) -> bool {
-        matches!(self, Direction::Back | Direction::DownBack | Direction::UpBack)
+        matches!(
+            self,
+            Direction::Back | Direction::DownBack | Direction::UpBack
+        )
     }
 
     pub fn is_forward(&self) -> bool {
-        matches!(self, Direction::Forward | Direction::DownForward | Direction::UpForward)
+        matches!(
+            self,
+            Direction::Forward | Direction::DownForward | Direction::UpForward
+        )
     }
 }
 
@@ -193,7 +205,7 @@ impl InputBuffer {
 
             // Try to match the full sequence starting from this point
             for seq_offset in 0..sequence.len() {
-                let buffer_idx = if self.write_index >= start_back + seq_offset + 1 {
+                let buffer_idx = if self.write_index > start_back + seq_offset {
                     self.write_index - start_back - seq_offset - 1
                 } else {
                     INPUT_BUFFER_SIZE + self.write_index - start_back - seq_offset - 1
@@ -224,6 +236,12 @@ impl InputBuffer {
 /// Input manager for multiple players
 pub struct InputManager {
     pub player_inputs: [InputBuffer; MAX_PLAYERS],
+}
+
+impl Default for InputManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl InputManager {
@@ -288,9 +306,18 @@ mod tests {
         let mut buffer = InputBuffer::new(Facing::Right);
 
         // Simulate quarter circle forward
-        buffer.push(InputState { direction: Direction::Down, ..InputState::neutral() });
-        buffer.push(InputState { direction: Direction::DownForward, ..InputState::neutral() });
-        buffer.push(InputState { direction: Direction::Forward, ..InputState::neutral() });
+        buffer.push(InputState {
+            direction: Direction::Down,
+            ..InputState::neutral()
+        });
+        buffer.push(InputState {
+            direction: Direction::DownForward,
+            ..InputState::neutral()
+        });
+        buffer.push(InputState {
+            direction: Direction::Forward,
+            ..InputState::neutral()
+        });
 
         assert!(buffer.detect_qcf());
         assert!(!buffer.detect_qcb());
@@ -301,9 +328,18 @@ mod tests {
         let mut buffer = InputBuffer::new(Facing::Right);
 
         // Simulate dragon punch motion (forward, down, down-forward)
-        buffer.push(InputState { direction: Direction::Forward, ..InputState::neutral() });
-        buffer.push(InputState { direction: Direction::Down, ..InputState::neutral() });
-        buffer.push(InputState { direction: Direction::DownForward, ..InputState::neutral() });
+        buffer.push(InputState {
+            direction: Direction::Forward,
+            ..InputState::neutral()
+        });
+        buffer.push(InputState {
+            direction: Direction::Down,
+            ..InputState::neutral()
+        });
+        buffer.push(InputState {
+            direction: Direction::DownForward,
+            ..InputState::neutral()
+        });
 
         assert!(buffer.detect_dp());
     }

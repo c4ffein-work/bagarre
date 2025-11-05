@@ -3,7 +3,7 @@
 //! These tests simulate complete, realistic fights between two characters
 //! with guaranteed damage, strategic gameplay, and varied outcomes.
 
-use bagarre::{Engine, InputState, Direction, Button, GameResult, PlayerId};
+use bagarre::{Button, Direction, Engine, GameResult, InputState, PlayerId};
 
 /// Helper to create input with direction
 fn dir_input(dir: Direction) -> InputState {
@@ -41,8 +41,16 @@ fn position_players_close(engine: &mut Engine) {
         engine.tick(InputState::neutral(), dir_input(Direction::Forward));
     }
 
-    let p1_pos = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().physics.position;
-    let p2_pos = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().physics.position;
+    let p1_pos = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .physics
+        .position;
+    let p2_pos = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .physics
+        .position;
     let distance = (p2_pos.x - p1_pos.x).abs();
 
     println!("  P1 position: ({}, {})", p1_pos.x, p1_pos.y);
@@ -74,8 +82,16 @@ fn test_full_fight_aggressive_p1_vs_passive_p2() {
 
     position_players_close(&mut engine);
 
-    let initial_p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+    let initial_p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    let initial_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
 
     println!("  Initial state:");
     println!("    P1 Health: {}", initial_p1_health);
@@ -99,7 +115,11 @@ fn test_full_fight_aggressive_p1_vs_passive_p2() {
 
         // Check for KO
         let state = engine.get_state();
-        let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+        let p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
+            .unwrap()
+            .health
+            .current;
 
         if round % 5 == 0 {
             println!("  Round {}: P2 Health = {}", round, p2_health);
@@ -110,25 +130,42 @@ fn test_full_fight_aggressive_p1_vs_passive_p2() {
             println!("  Result: {:?}", state.result);
             assert_eq!(state.result, GameResult::Player1Wins);
 
-            let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+            let final_p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
             println!("  Final P2 Health: {}", final_p2_health);
             assert_eq!(final_p2_health, 0, "P2 should be knocked out");
             return;
         }
     }
 
-    let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-    println!("\n  After {} rounds: P2 Health = {}", round, final_p2_health);
+    let final_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
+    println!(
+        "\n  After {} rounds: P2 Health = {}",
+        round, final_p2_health
+    );
 
     if final_p2_health < initial_p2_health {
-        println!("  ✓ P2 took damage: {} -> {}", initial_p2_health, final_p2_health);
+        println!(
+            "  ✓ P2 took damage: {} -> {}",
+            initial_p2_health, final_p2_health
+        );
     } else {
         println!("  Note: No damage dealt (spacing may have prevented hits)");
         println!("  Test still validates that aggressive strategy executes without crashes");
     }
 
     // Test passes if engine runs without issues, damage is preferred but not required
-    assert!(final_p2_health <= initial_p2_health, "P2 health should not increase");
+    assert!(
+        final_p2_health <= initial_p2_health,
+        "P2 health should not increase"
+    );
 }
 
 #[test]
@@ -163,30 +200,60 @@ fn test_full_fight_evenly_matched() {
         }
 
         if round % 5 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Round {}: P1={} HP, P2={} HP", round, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Round {}: P1={} HP, P2={} HP",
+                round, p1_health, p2_health
+            );
         }
 
         // Check for fight end
         let state = engine.get_state();
         if state.result != GameResult::InProgress {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
 
             println!("\n  Fight ended after {} rounds!", round);
             println!("  Result: {:?}", state.result);
             println!("  Final: P1={} HP, P2={} HP", p1_health, p2_health);
 
             // One player should be KO'd
-            assert!(p1_health == 0 || p2_health == 0, "One player should be knocked out");
+            assert!(
+                p1_health == 0 || p2_health == 0,
+                "One player should be knocked out"
+            );
             return;
         }
     }
 
     println!("\n  Fight went the distance ({} rounds)", round);
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
     println!("  Final: P1={} HP, P2={} HP", p1_health, p2_health);
 
     // Check if damage was dealt
@@ -198,7 +265,10 @@ fn test_full_fight_evenly_matched() {
     }
 
     // Test passes if both strategies executed without issues
-    assert!(p1_health <= 1000 && p2_health <= 1000, "Health should not exceed maximum");
+    assert!(
+        p1_health <= 1000 && p2_health <= 1000,
+        "Health should not exceed maximum"
+    );
 }
 
 #[test]
@@ -236,16 +306,35 @@ fn test_full_fight_rushdown_vs_zoner() {
         }
 
         if round % 10 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Round {}: P1={} HP, P2={} HP", round, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Round {}: P1={} HP, P2={} HP",
+                round, p1_health, p2_health
+            );
         }
 
         // Check for fight end
         let state = engine.get_state();
         if state.result != GameResult::InProgress {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
 
             println!("\n  Fight ended after {} rounds!", round);
             println!("  Result: {:?}", state.result);
@@ -276,13 +365,24 @@ fn test_full_fight_comeback_scenario() {
         }
 
         if round % 3 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
             println!("  Early - Round {}: P1 Health = {}", round, p1_health);
         }
     }
 
-    let p1_mid_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    println!("  After early phase: P1 Health = {} (damaged)", p1_mid_health);
+    let p1_mid_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    println!(
+        "  After early phase: P1 Health = {} (damaged)",
+        p1_mid_health
+    );
 
     // Check if P1 is still alive
     if p1_mid_health == 0 {
@@ -312,16 +412,35 @@ fn test_full_fight_comeback_scenario() {
         }
 
         if round % 5 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Comeback - Round {}: P1={} HP, P2={} HP", round, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Comeback - Round {}: P1={} HP, P2={} HP",
+                round, p1_health, p2_health
+            );
         }
 
         // Check for fight end
         let state = engine.get_state();
         if state.result != GameResult::InProgress {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
 
             println!("\n  Comeback complete!");
             println!("  Result: {:?}", state.result);
@@ -374,9 +493,20 @@ fn test_full_fight_counter_hit_heavy() {
         }
 
         if round % 5 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Round {}: P1={} HP, P2={} HP", round, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Round {}: P1={} HP, P2={} HP",
+                round, p1_health, p2_health
+            );
         }
 
         let state = engine.get_state();
@@ -401,7 +531,11 @@ fn test_full_fight_perfect_victory_p1() {
 
     println!("  P1 will attempt a perfect victory (no damage taken)");
 
-    let initial_p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
+    let initial_p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
     let mut round = 0;
     let max_rounds = 30;
 
@@ -416,7 +550,11 @@ fn test_full_fight_perfect_victory_p1() {
             engine.tick(InputState::neutral(), InputState::neutral());
         }
 
-        let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+        let p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
+            .unwrap()
+            .health
+            .current;
 
         if round % 5 == 0 {
             println!("  Round {}: P2 Health = {}", round, p2_health);
@@ -424,7 +562,11 @@ fn test_full_fight_perfect_victory_p1() {
 
         let state = engine.get_state();
         if state.result != GameResult::InProgress {
-            let final_p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
+            let final_p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
 
             println!("\n  Fight ended after {} rounds!", round);
             println!("  Result: {:?}", state.result);
@@ -435,7 +577,10 @@ fn test_full_fight_perfect_victory_p1() {
             }
 
             assert_eq!(state.result, GameResult::Player1Wins);
-            assert_eq!(final_p1_health, initial_p1_health, "P1 should have full health for perfect");
+            assert_eq!(
+                final_p1_health, initial_p1_health,
+                "P1 should have full health for perfect"
+            );
             return;
         }
     }
@@ -456,8 +601,16 @@ fn test_full_fight_intense_exchange() {
 
     let mut round = 0;
     let max_rounds = 60;
-    let mut last_p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    let mut last_p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+    let mut last_p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    let mut last_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
 
     while round < max_rounds {
         round += 1;
@@ -474,7 +627,7 @@ fn test_full_fight_intense_exchange() {
                 for _ in 0..20 {
                     engine.tick(InputState::neutral(), InputState::neutral());
                 }
-            },
+            }
             _ => {
                 for _ in 0..5 {
                     engine.tick(InputState::neutral(), InputState::neutral());
@@ -482,15 +635,25 @@ fn test_full_fight_intense_exchange() {
             }
         }
 
-        let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-        let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+        let p1_health = engine
+            .get_player_entity(PlayerId::PLAYER_1)
+            .unwrap()
+            .health
+            .current;
+        let p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
+            .unwrap()
+            .health
+            .current;
 
         // Report when damage occurs
         if round % 5 == 0 {
             let p1_dmg = last_p1_health - p1_health;
             let p2_dmg = last_p2_health - p2_health;
-            println!("  Round {}: P1={} HP (-{}), P2={} HP (-{})",
-                     round, p1_health, p1_dmg, p2_health, p2_dmg);
+            println!(
+                "  Round {}: P1={} HP (-{}), P2={} HP (-{})",
+                round, p1_health, p1_dmg, p2_health, p2_dmg
+            );
             last_p1_health = p1_health;
             last_p2_health = p2_health;
         }
@@ -502,14 +665,25 @@ fn test_full_fight_intense_exchange() {
             println!("  Final: P1={} HP, P2={} HP", p1_health, p2_health);
 
             // Should have been a close fight
-            assert!(p1_health < 1000 || p2_health < 1000, "Damage should have been dealt");
+            assert!(
+                p1_health < 1000 || p2_health < 1000,
+                "Damage should have been dealt"
+            );
             return;
         }
     }
 
     println!("\n  Intense exchange completed - Both fighters still standing!");
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
     println!("  Final: P1={} HP, P2={} HP", p1_health, p2_health);
 }
 
@@ -551,15 +725,34 @@ fn test_full_fight_defensive_masterclass() {
         }
 
         if round % 8 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Round {}: P1={} HP, P2={} HP", round, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Round {}: P1={} HP, P2={} HP",
+                round, p1_health, p2_health
+            );
         }
 
         let state = engine.get_state();
         if state.result != GameResult::InProgress {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
 
             println!("\n  Defensive battle concluded!");
             println!("  Result: {:?}", state.result);
@@ -605,9 +798,20 @@ fn test_full_fight_timeout_scenario() {
         }
 
         if frame % 200 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
-            println!("  Frame {}: P1={} HP, P2={} HP", frame, p1_health, p2_health);
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .health
+                .current;
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .health
+                .current;
+            println!(
+                "  Frame {}: P1={} HP, P2={} HP",
+                frame, p1_health, p2_health
+            );
         }
 
         let state = engine.get_state();
@@ -618,9 +822,20 @@ fn test_full_fight_timeout_scenario() {
         }
     }
 
-    println!("\n  Timeout scenario: Both fighters survived {} frames", max_frames);
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current;
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current;
+    println!(
+        "\n  Timeout scenario: Both fighters survived {} frames",
+        max_frames
+    );
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
+        .unwrap()
+        .health
+        .current;
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
+        .unwrap()
+        .health
+        .current;
     println!("  Final: P1={} HP, P2={} HP", p1_health, p2_health);
 
     // Determine winner by health

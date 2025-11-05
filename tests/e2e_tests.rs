@@ -3,7 +3,7 @@
 //! These tests simulate complete fight scenarios to ensure the entire engine
 //! works correctly in realistic gameplay situations.
 
-use bagarre::{Engine, InputState, Direction, Button, GameResult, PlayerId, Facing};
+use bagarre::{Button, Direction, Engine, Facing, GameResult, InputState, PlayerId};
 
 /// Helper to create an input with a specific direction
 fn input_with_direction(dir: Direction) -> InputState {
@@ -33,9 +33,11 @@ fn test_complete_fight_p1_wins_by_ko() {
     let mut engine = Engine::new();
     engine.init_match();
 
-    let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let initial_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("=== E2E: Player 1 Wins by KO ===");
     println!("Initial P2 Health: {}", initial_p2_health);
@@ -52,9 +54,11 @@ fn test_complete_fight_p1_wins_by_ko() {
         }
 
         // Check if damage was dealt
-        let current_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        let current_p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
             .unwrap()
-            .health.current;
+            .health
+            .current;
 
         if current_p2_health < initial_p2_health {
             attacks_landed += 1;
@@ -86,9 +90,11 @@ fn test_complete_fight_with_blocking() {
 
     println!("=== E2E: Fight with Blocking ===");
 
-    let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let initial_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     // Player 1 attacks, Player 2 blocks
     for _ in 0..5 {
@@ -98,7 +104,10 @@ fn test_complete_fight_with_blocking() {
         }
 
         // P1 attacks, P2 blocks
-        engine.tick(input_with_button(Button::Light), input_with_direction(Direction::Back));
+        engine.tick(
+            input_with_button(Button::Light),
+            input_with_direction(Direction::Back),
+        );
 
         // Wait for attack duration
         for _ in 0..20 {
@@ -106,9 +115,11 @@ fn test_complete_fight_with_blocking() {
         }
     }
 
-    let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let final_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("Initial P2 Health: {}", initial_p2_health);
     println!("Final P2 Health: {}", final_p2_health);
@@ -127,12 +138,17 @@ fn test_complete_fight_combo_sequence() {
 
     // Move P1 closer to P2 first
     for _ in 0..60 {
-        engine.tick(input_with_direction(Direction::Forward), InputState::neutral());
+        engine.tick(
+            input_with_direction(Direction::Forward),
+            InputState::neutral(),
+        );
     }
 
-    let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let initial_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     // Perform a combo: Light -> Medium -> Heavy
 
@@ -160,9 +176,11 @@ fn test_complete_fight_combo_sequence() {
         engine.tick(InputState::neutral(), InputState::neutral());
     }
 
-    let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let final_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("Initial Health: {}", initial_p2_health);
     println!("Final Health: {}", final_p2_health);
@@ -183,8 +201,14 @@ fn test_complete_fight_special_move_qcf() {
 
     // Perform Quarter Circle Forward motion
     engine.tick(input_with_direction(Direction::Down), InputState::neutral());
-    engine.tick(input_with_direction(Direction::DownForward), InputState::neutral());
-    engine.tick(input_with_direction(Direction::Forward), InputState::neutral());
+    engine.tick(
+        input_with_direction(Direction::DownForward),
+        InputState::neutral(),
+    );
+    engine.tick(
+        input_with_direction(Direction::Forward),
+        InputState::neutral(),
+    );
 
     // Press special button
     let mut special_input = input_with_direction(Direction::Forward);
@@ -211,9 +235,15 @@ fn test_complete_fight_dragon_punch() {
     println!("=== E2E: Dragon Punch Motion ===");
 
     // Perform Dragon Punch motion (Forward, Down, Down-Forward)
-    engine.tick(input_with_direction(Direction::Forward), InputState::neutral());
+    engine.tick(
+        input_with_direction(Direction::Forward),
+        InputState::neutral(),
+    );
     engine.tick(input_with_direction(Direction::Down), InputState::neutral());
-    engine.tick(input_with_direction(Direction::DownForward), InputState::neutral());
+    engine.tick(
+        input_with_direction(Direction::DownForward),
+        InputState::neutral(),
+    );
 
     // Press attack button
     let mut dp_input = input_with_direction(Direction::DownForward);
@@ -240,16 +270,22 @@ fn test_complete_fight_both_players_attacking() {
 
     // Move players closer together first
     for _ in 0..40 {
-        engine.tick(input_with_direction(Direction::Forward),
-                   input_with_direction(Direction::Back));
+        engine.tick(
+            input_with_direction(Direction::Forward),
+            input_with_direction(Direction::Back),
+        );
     }
 
-    let initial_p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+    let initial_p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .health.current;
-    let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        .health
+        .current;
+    let initial_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     // Simulate an intense exchange
     for round in 0..10 {
@@ -259,7 +295,10 @@ fn test_complete_fight_both_players_attacking() {
         } else if round % 3 == 1 {
             engine.tick(InputState::neutral(), input_with_button(Button::Medium));
         } else {
-            engine.tick(input_with_button(Button::Medium), input_with_button(Button::Light));
+            engine.tick(
+                input_with_button(Button::Medium),
+                input_with_button(Button::Light),
+            );
         }
 
         // Let attacks resolve
@@ -268,12 +307,16 @@ fn test_complete_fight_both_players_attacking() {
         }
     }
 
-    let final_p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+    let final_p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .health.current;
-    let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        .health
+        .current;
+    let final_p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("P1: {} -> {}", initial_p1_health, final_p1_health);
     println!("P2: {} -> {}", initial_p2_health, final_p2_health);
@@ -292,12 +335,16 @@ fn test_complete_fight_movement_and_spacing() {
 
     println!("=== E2E: Movement and Spacing ===");
 
-    let p1_initial_pos = engine.get_player_entity(PlayerId::PLAYER_1)
+    let p1_initial_pos = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .physics.position;
-    let p2_initial_pos = engine.get_player_entity(PlayerId::PLAYER_2)
+        .physics
+        .position;
+    let p2_initial_pos = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .physics.position;
+        .physics
+        .position;
 
     println!("Initial positions:");
     println!("  P1: ({}, {})", p1_initial_pos.x, p1_initial_pos.y);
@@ -305,7 +352,10 @@ fn test_complete_fight_movement_and_spacing() {
 
     // Player 1 walks forward
     for _ in 0..30 {
-        engine.tick(input_with_direction(Direction::Forward), InputState::neutral());
+        engine.tick(
+            input_with_direction(Direction::Forward),
+            InputState::neutral(),
+        );
     }
 
     // Player 2 walks backward
@@ -313,12 +363,16 @@ fn test_complete_fight_movement_and_spacing() {
         engine.tick(InputState::neutral(), input_with_direction(Direction::Back));
     }
 
-    let p1_final_pos = engine.get_player_entity(PlayerId::PLAYER_1)
+    let p1_final_pos = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .physics.position;
-    let p2_final_pos = engine.get_player_entity(PlayerId::PLAYER_2)
+        .physics
+        .position;
+    let p2_final_pos = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .physics.position;
+        .physics
+        .position;
 
     println!("Final positions:");
     println!("  P1: ({}, {})", p1_final_pos.x, p1_final_pos.y);
@@ -362,7 +416,10 @@ fn test_complete_fight_hitstun_and_blockstun() {
     }
 
     // P2 blocks, P1 attacks
-    engine.tick(input_with_button(Button::Light), input_with_direction(Direction::Back));
+    engine.tick(
+        input_with_button(Button::Light),
+        input_with_direction(Direction::Back),
+    );
 
     for _ in 0..10 {
         engine.tick(InputState::neutral(), input_with_direction(Direction::Back));
@@ -384,9 +441,11 @@ fn test_complete_fight_knockback_and_momentum() {
 
     println!("=== E2E: Knockback and Momentum ===");
 
-    let p2_initial_pos = engine.get_player_entity(PlayerId::PLAYER_2)
+    let p2_initial_pos = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .physics.position;
+        .physics
+        .position;
 
     // P1 does heavy attack (should cause significant knockback)
     engine.tick(input_with_button(Button::Heavy), InputState::neutral());
@@ -400,20 +459,26 @@ fn test_complete_fight_knockback_and_momentum() {
     let p2_after_hit = engine.get_player_entity(PlayerId::PLAYER_2).unwrap();
     let momentum = p2_after_hit.physics.momentum;
 
-    println!("P2 Momentum after heavy hit: ({}, {})", momentum.x, momentum.y);
+    println!(
+        "P2 Momentum after heavy hit: ({}, {})",
+        momentum.x, momentum.y
+    );
 
     // Let momentum carry P2
     for _ in 0..20 {
         engine.tick(InputState::neutral(), InputState::neutral());
     }
 
-    let p2_final_pos = engine.get_player_entity(PlayerId::PLAYER_2)
+    let p2_final_pos = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .physics.position;
+        .physics
+        .position;
 
-    println!("P2 Position change: ({}, {}) -> ({}, {})",
-             p2_initial_pos.x, p2_initial_pos.y,
-             p2_final_pos.x, p2_final_pos.y);
+    println!(
+        "P2 Position change: ({}, {}) -> ({}, {})",
+        p2_initial_pos.x, p2_initial_pos.y, p2_final_pos.x, p2_final_pos.y
+    );
 
     // Position may have changed due to knockback
     // Engine should still be running
@@ -461,12 +526,16 @@ fn test_complete_fight_long_match() {
 
     println!("Match simulated for {} frames", frame_count);
 
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .health.current;
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        .health
+        .current;
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("Final healths - P1: {}, P2: {}", p1_health, p2_health);
 
@@ -483,8 +552,10 @@ fn test_complete_fight_aggressive_vs_defensive() {
 
     // Move players closer together
     for _ in 0..50 {
-        engine.tick(input_with_direction(Direction::Forward),
-                   input_with_direction(Direction::Back));
+        engine.tick(
+            input_with_direction(Direction::Forward),
+            input_with_direction(Direction::Back),
+        );
     }
 
     let mut rounds = 0;
@@ -496,7 +567,10 @@ fn test_complete_fight_aggressive_vs_defensive() {
 
         // P1: Aggressive - attacks often
         for _ in 0..5 {
-            engine.tick(input_with_button(Button::Light), input_with_direction(Direction::Back));
+            engine.tick(
+                input_with_button(Button::Light),
+                input_with_direction(Direction::Back),
+            );
         }
 
         // P2: Wait for opening
@@ -522,12 +596,16 @@ fn test_complete_fight_aggressive_vs_defensive() {
     let state = engine.get_state();
     println!("Match result after {} rounds: {:?}", rounds, state.result);
 
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .unwrap()
-        .health.current;
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        .health
+        .current;
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("Final healths - P1: {}, P2: {}", p1_health, p2_health);
 
@@ -546,7 +624,7 @@ fn test_complete_fight_frame_perfect_inputs() {
     println!("=== E2E: Frame-Perfect Input Sequence ===");
 
     // Test precise input timing for a combo
-    let input_sequence = vec![
+    let input_sequence = [
         (0, input_with_button(Button::Light), InputState::neutral()),
         (6, input_with_button(Button::Light), InputState::neutral()),
         (12, input_with_button(Button::Medium), InputState::neutral()),
@@ -557,22 +635,27 @@ fn test_complete_fight_frame_perfect_inputs() {
     let mut sequence_idx = 0;
 
     while frame < 100 {
-        let (p1_input, p2_input) = if sequence_idx < input_sequence.len()
-            && input_sequence[sequence_idx].0 == frame {
-            let inputs = (input_sequence[sequence_idx].1, input_sequence[sequence_idx].2);
-            sequence_idx += 1;
-            inputs
-        } else {
-            (InputState::neutral(), InputState::neutral())
-        };
+        let (p1_input, p2_input) =
+            if sequence_idx < input_sequence.len() && input_sequence[sequence_idx].0 == frame {
+                let inputs = (
+                    input_sequence[sequence_idx].1,
+                    input_sequence[sequence_idx].2,
+                );
+                sequence_idx += 1;
+                inputs
+            } else {
+                (InputState::neutral(), InputState::neutral())
+            };
 
         engine.tick(p1_input, p2_input);
         frame += 1;
     }
 
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .unwrap()
-        .health.current;
+        .health
+        .current;
 
     println!("After frame-perfect combo: P2 Health = {}", p2_health);
 
@@ -590,7 +673,10 @@ fn test_complete_fight_simultaneous_ko() {
     // Damage both players
     for _ in 0..15 {
         // Both attack at once
-        engine.tick(input_with_button(Button::Heavy), input_with_button(Button::Heavy));
+        engine.tick(
+            input_with_button(Button::Heavy),
+            input_with_button(Button::Heavy),
+        );
 
         for _ in 0..40 {
             engine.tick(InputState::neutral(), InputState::neutral());
@@ -598,10 +684,12 @@ fn test_complete_fight_simultaneous_ko() {
     }
 
     let state = engine.get_state();
-    let p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+    let p1_health = engine
+        .get_player_entity(PlayerId::PLAYER_1)
         .map(|e| e.health.current)
         .unwrap_or(0);
-    let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+    let p2_health = engine
+        .get_player_entity(PlayerId::PLAYER_2)
         .map(|e| e.health.current)
         .unwrap_or(0);
 
@@ -609,8 +697,10 @@ fn test_complete_fight_simultaneous_ko() {
     println!("P1 Health: {}, P2 Health: {}", p1_health, p2_health);
 
     // One player should win, or it's a draw
-    assert!(state.result == GameResult::Player1Wins
-         || state.result == GameResult::Player2Wins
-         || state.result == GameResult::Draw
-         || state.result == GameResult::InProgress);
+    assert!(
+        state.result == GameResult::Player1Wins
+            || state.result == GameResult::Player2Wins
+            || state.result == GameResult::Draw
+            || state.result == GameResult::InProgress
+    );
 }
