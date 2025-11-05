@@ -1,5 +1,19 @@
 # 🥊 Bagarre Fighting Game Engine
 
+---
+
+## ⚠️ 🤖 EXPERIMENTAL VIBE-CODING PROJECT 🤖 ⚠️
+
+**100% vibe-coded with Claude AI in minutes to experiment with AI-assisted development.**
+
+From "let's build a fighting game engine" to a working WASM browser demo with state machines, hitboxes, and motion detection - all in minutes. Experiment complete, moving on to other projects (Castagne port to godot-rust? 👀).
+
+All tests pass, browser demo works, but don't use this for production. Feel free to explore and learn from it!
+
+🦀✨ Made with curiosity and zero pretense.
+
+---
+
 A lightweight, zero-dependency fighting game engine written in Rust, inspired by the [Castagne](https://github.com/panthavma/castagne) engine architecture. Designed for competitive fighting games with frame-perfect gameplay and WASM browser support.
 
 **"Bagarre"** (French) = fight, brawl, scuffle - a fitting name for a fighting game engine!
