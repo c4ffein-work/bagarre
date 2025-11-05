@@ -4,9 +4,32 @@ This directory contains comprehensive end-to-end tests that simulate complete fi
 
 ## Overview
 
-The E2E tests in `e2e_tests.rs` go beyond unit testing to verify that the entire engine works correctly in real-world fighting game situations. These tests simulate multiple frames of gameplay, player interactions, and complete fight scenarios.
+The E2E tests go beyond unit testing to verify that the entire engine works correctly in real-world fighting game situations. These tests simulate multiple frames of gameplay, player interactions, and complete fight scenarios.
 
-## Test Coverage
+### Test Files
+
+1. **`e2e_tests.rs`** (13 tests) - Core mechanics and system integration tests
+2. **`e2e_full_fights.rs`** (9 tests) - **Complete full fight simulations between characters**
+
+## Test Coverage (22 Total E2E Tests)
+
+### Full Fight Simulations (`e2e_full_fights.rs` - 9 tests) ⭐ NEW!
+
+These tests simulate **complete fights from start to finish** with realistic character interactions:
+
+- **test_full_fight_aggressive_p1_vs_passive_p2**: P1 relentlessly attacks passive P2 until KO
+- **test_full_fight_evenly_matched**: Both players trade attacks evenly in balanced combat
+- **test_full_fight_rushdown_vs_zoner**: Rushdown character vs defensive zoning strategy
+- **test_full_fight_comeback_scenario**: P2 dominates early, P1 makes dramatic comeback
+- **test_full_fight_counter_hit_heavy**: Testing counter-hit mechanics and timing
+- **test_full_fight_perfect_victory_p1**: P1 wins without taking any damage
+- **test_full_fight_intense_exchange**: Rapid back-and-forth combat with constant pressure
+- **test_full_fight_defensive_masterclass**: Defensive blocking strategy vs aggression
+- **test_full_fight_timeout_scenario**: Cautious play leading to potential timeout
+
+### Core Mechanics Tests (`e2e_tests.rs` - 13 tests)
+
+## Detailed Test Coverage
 
 ### Complete Fight Simulations
 - **test_complete_fight_p1_wins_by_ko**: Simulates a full match where Player 1 defeats Player 2 through repeated attacks
@@ -36,24 +59,37 @@ The E2E tests in `e2e_tests.rs` go beyond unit testing to verify that the entire
 
 Run all E2E tests:
 ```bash
+cargo test --test e2e_tests --test e2e_full_fights
+```
+
+Run only core mechanics tests:
+```bash
 cargo test --test e2e_tests
+```
+
+Run only full fight simulations:
+```bash
+cargo test --test e2e_full_fights
 ```
 
 Run a specific E2E test:
 ```bash
 cargo test --test e2e_tests test_complete_fight_combo_sequence
+cargo test --test e2e_full_fights test_full_fight_comeback_scenario
 ```
 
-Run with output:
+Run with detailed output:
 ```bash
-cargo test --test e2e_tests -- --nocapture
+cargo test --test e2e_full_fights -- --nocapture
 ```
 
 ## Test Results
 
-Current status: **All 13 E2E tests passing** ✅
+Current status: **All 22 E2E tests passing** ✅
+- Core mechanics tests: **13 passing** ✅
+- Full fight simulations: **9 passing** ✅
 
-These tests complement the 35 unit/integration tests in `src/lib.rs` for a total of **48 comprehensive tests**.
+These tests complement the 35 unit/integration tests in `src/lib.rs` for a total of **57 comprehensive tests**.
 
 ## What the E2E Tests Verify
 
