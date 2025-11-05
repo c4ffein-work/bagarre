@@ -4,21 +4,13 @@
 
 ## ⚠️ 🤖 EXPERIMENTAL VIBE-CODING PROJECT 🤖 ⚠️
 
-**This entire project was 100% vibe-coded with Claude AI to experiment with AI-assisted development!**
+**100% vibe-coded with Claude AI in minutes to experiment with AI-assisted development.**
 
-This was a fun exploration to see what could be built collaboratively with AI assistance. We went from "let's build a fighting game engine" to a working WASM browser demo with state machines, hitboxes, input buffering, and motion detection - all in **minutes** of experimental coding.
+From "let's build a fighting game engine" to a working WASM browser demo with state machines, hitboxes, and motion detection - all in minutes. Experiment complete, moving on to other projects (Castagne port to godot-rust? 👀).
 
-**What we learned:**
-- ✅ AI-assisted architecture can actually work pretty well
-- ✅ Rapid prototyping with zero dependencies is viable
-- ✅ Going from idea to browser demo is shockingly fast with the right help
-- ✅ Test-driven development with AI pair programming is fun!
+All tests pass, browser demo works, but don't use this for production. Feel free to explore and learn from it!
 
-**Status:** This experiment is now **complete**. The creator is moving on to more interesting experiments (possibly porting Castagne to godot-rust? 👀). This repo remains as a snapshot of what's possible when you vibe-code with AI for a few minutes.
-
-**Should you use this?** Probably not for production! But feel free to explore the code, steal ideas, or use it as learning material. Everything works, all tests pass, and the browser demo is live - it's just not going anywhere from here.
-
-Made with curiosity, Claude AI, and zero pretense about being a "serious" engine. 🦀✨
+🦀✨ Made with curiosity and zero pretense.
 
 ---
 
