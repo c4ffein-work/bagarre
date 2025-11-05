@@ -137,6 +137,7 @@ impl Entity {
     fn register_default_states(&mut self) {
         self.state_machine.register_state(states::idle());
         self.state_machine.register_state(states::walk());
+        self.state_machine.register_state(states::walk_back());
         self.state_machine.register_state(states::jump());
         self.state_machine.register_state(states::light_attack());
         self.state_machine.register_state(states::medium_attack());
@@ -227,10 +228,15 @@ impl Entity {
                 }
             }
             Direction::Back | Direction::DownBack | Direction::UpBack => {
+                // Transition to backward walk if idle
+                if self.state_machine.current_state() == StateId::Idle {
+                    self.state_machine.transition(StateId::WalkBack);
+                }
                 // Blocking handled in hit processing
             }
             _ => {
-                if self.state_machine.current_state() == StateId::Walk {
+                let current_state = self.state_machine.current_state();
+                if current_state == StateId::Walk || current_state == StateId::WalkBack {
                     self.state_machine.transition(StateId::Idle);
                 }
             }

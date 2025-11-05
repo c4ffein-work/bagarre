@@ -20,7 +20,7 @@ const p2Input = {
 
 // State names
 const STATE_NAMES = [
-    'Idle', 'Walk', 'Crouch', 'Jump',
+    'Idle', 'Walk', 'WalkBack', 'Crouch', 'Jump',
     'Light', 'Medium', 'Heavy', 'Special',
     'Hit', 'Block', 'Down'
 ];
