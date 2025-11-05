@@ -1,6 +1,7 @@
 /// Input system with motion detection for fighting games
 /// Supports directional inputs, buttons, and special move motions
 
+use crate::constants::*;
 use crate::types::Facing;
 
 /// Button inputs
@@ -120,9 +121,9 @@ impl InputState {
 }
 
 /// Input buffer for motion detection
-/// Keeps last 30 frames (0.5 seconds at 60fps)
+/// Keeps last INPUT_BUFFER_SIZE frames (0.5 seconds at 60fps)
 pub struct InputBuffer {
-    buffer: [InputState; 30],
+    buffer: [InputState; INPUT_BUFFER_SIZE],
     write_index: usize,
     facing: Facing,
 }
@@ -130,7 +131,7 @@ pub struct InputBuffer {
 impl InputBuffer {
     pub fn new(facing: Facing) -> Self {
         Self {
-            buffer: [InputState::neutral(); 30],
+            buffer: [InputState::neutral(); INPUT_BUFFER_SIZE],
             write_index: 0,
             facing,
         }
@@ -139,12 +140,16 @@ impl InputBuffer {
     /// Push new input state to buffer
     pub fn push(&mut self, input: InputState) {
         self.buffer[self.write_index] = input;
-        self.write_index = (self.write_index + 1) % 30;
+        self.write_index = (self.write_index + 1) % INPUT_BUFFER_SIZE;
     }
 
     /// Get most recent input
     pub fn current(&self) -> InputState {
-        let prev_index = if self.write_index == 0 { 29 } else { self.write_index - 1 };
+        let prev_index = if self.write_index == 0 {
+            INPUT_BUFFER_SIZE - 1
+        } else {
+            self.write_index - 1
+        };
         self.buffer[prev_index]
     }
 
@@ -152,7 +157,7 @@ impl InputBuffer {
     pub fn button_just_pressed(&self, button: Button) -> bool {
         let current = self.current();
         let prev_index = if self.write_index < 2 {
-            28 + self.write_index
+            INPUT_BUFFER_SIZE - 2 + self.write_index
         } else {
             self.write_index - 2
         };
@@ -182,10 +187,8 @@ impl InputBuffer {
             return false;
         }
 
-        let window = 15; // Check last 15 frames (0.25 seconds)
-
-        // Walk backwards through buffer looking for the END of the sequence first
-        for start_back in 0..window {
+        // Check last MOTION_DETECTION_WINDOW frames (0.25 seconds at 60 FPS)
+        for start_back in 0..MOTION_DETECTION_WINDOW {
             let mut matched = true;
 
             // Try to match the full sequence starting from this point
@@ -193,7 +196,7 @@ impl InputBuffer {
                 let buffer_idx = if self.write_index >= start_back + seq_offset + 1 {
                     self.write_index - start_back - seq_offset - 1
                 } else {
-                    30 + self.write_index - start_back - seq_offset - 1
+                    INPUT_BUFFER_SIZE + self.write_index - start_back - seq_offset - 1
                 };
 
                 let dir = self.buffer[buffer_idx].direction;
@@ -220,7 +223,7 @@ impl InputBuffer {
 
 /// Input manager for multiple players
 pub struct InputManager {
-    pub player_inputs: [InputBuffer; 2],
+    pub player_inputs: [InputBuffer; MAX_PLAYERS],
 }
 
 impl InputManager {
@@ -234,13 +237,13 @@ impl InputManager {
     }
 
     pub fn update_player_input(&mut self, player: usize, input: InputState) {
-        if player < 2 {
+        if player < MAX_PLAYERS {
             self.player_inputs[player].push(input);
         }
     }
 
     pub fn get_player_input(&self, player: usize) -> Option<&InputBuffer> {
-        if player < 2 {
+        if player < MAX_PLAYERS {
             Some(&self.player_inputs[player])
         } else {
             None

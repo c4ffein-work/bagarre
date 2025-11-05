@@ -1,6 +1,7 @@
 /// Main game engine - ties together all systems
 /// Inspired by Castagne's phase-based execution model
 
+use crate::constants::*;
 use crate::types::{Vec2, EntityId, PlayerId, Frame};
 use crate::entity::Entity;
 use crate::hitbox::{CollisionSystem, CollisionResult};
@@ -18,7 +19,7 @@ pub enum GameResult {
 /// Main game engine state
 pub struct Engine {
     pub frame: Frame,
-    pub entities: [Option<Entity>; 4], // Support 2 players + 2 projectiles
+    pub entities: [Option<Entity>; MAX_ENTITIES],
     pub entity_count: usize,
     pub collision_system: CollisionSystem,
     pub input_manager: InputManager,

@@ -1,6 +1,7 @@
 /// Hitbox and hurtbox system for collision detection
 /// Inspired by Castagne's attack/defense collision model
 
+use crate::constants::*;
 use crate::types::{Rect, Vec2, EntityId};
 
 /// Type of collision box
@@ -129,8 +130,8 @@ pub struct CollisionResult {
 
 /// Collision detection system
 pub struct CollisionSystem {
-    hitboxes: [Option<CollisionBox>; 32],
-    hurtboxes: [Option<CollisionBox>; 32],
+    hitboxes: [Option<CollisionBox>; MAX_HITBOXES],
+    hurtboxes: [Option<CollisionBox>; MAX_HURTBOXES],
     hit_count: usize,
     hurt_count: usize,
 }
@@ -138,8 +139,8 @@ pub struct CollisionSystem {
 impl CollisionSystem {
     pub fn new() -> Self {
         Self {
-            hitboxes: [None; 32],
-            hurtboxes: [None; 32],
+            hitboxes: [None; MAX_HITBOXES],
+            hurtboxes: [None; MAX_HURTBOXES],
             hit_count: 0,
             hurt_count: 0,
         }
@@ -148,21 +149,23 @@ impl CollisionSystem {
     pub fn clear(&mut self) {
         self.hit_count = 0;
         self.hurt_count = 0;
-        for i in 0..32 {
+        for i in 0..MAX_HITBOXES {
             self.hitboxes[i] = None;
+        }
+        for i in 0..MAX_HURTBOXES {
             self.hurtboxes[i] = None;
         }
     }
 
     pub fn add_hitbox(&mut self, hitbox: CollisionBox) {
-        if self.hit_count < 32 {
+        if self.hit_count < MAX_HITBOXES {
             self.hitboxes[self.hit_count] = Some(hitbox);
             self.hit_count += 1;
         }
     }
 
     pub fn add_hurtbox(&mut self, hurtbox: CollisionBox) {
-        if self.hurt_count < 32 {
+        if self.hurt_count < MAX_HURTBOXES {
             self.hurtboxes[self.hurt_count] = Some(hurtbox);
             self.hurt_count += 1;
         }
@@ -170,8 +173,8 @@ impl CollisionSystem {
 
     /// Check all hitbox vs hurtbox collisions
     /// Returns list of collision results
-    pub fn check_collisions(&self) -> [Option<CollisionResult>; 16] {
-        let mut results = [None; 16];
+    pub fn check_collisions(&self) -> [Option<CollisionResult>; MAX_COLLISIONS_PER_FRAME] {
+        let mut results = [None; MAX_COLLISIONS_PER_FRAME];
         let mut result_count = 0;
 
         for i in 0..self.hit_count {
@@ -194,7 +197,7 @@ impl CollisionSystem {
                         // Check collision
                         if hitbox.bounds.intersects(&hurtbox.bounds) {
                             if let Some(attack_data) = hitbox.attack_data {
-                                if result_count < 16 {
+                                if result_count < MAX_COLLISIONS_PER_FRAME {
                                     results[result_count] = Some(CollisionResult {
                                         attacker: hitbox.owner,
                                         defender: hurtbox.owner,

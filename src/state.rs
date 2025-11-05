@@ -1,6 +1,7 @@
 /// State machine system for character states
 /// Each state has frame data and can transition to other states
 
+use crate::constants::*;
 use crate::hitbox::AttackData;
 
 /// State ID for character states
@@ -82,7 +83,7 @@ pub struct State {
     pub state_type: StateType,
     pub duration: u32,          // Total frames
     pub can_cancel: bool,       // Can cancel to other states?
-    pub frame_data: [Option<FrameData>; 32], // Frame-specific actions
+    pub frame_data: [Option<FrameData>; MAX_FRAME_DATA_PER_STATE], // Frame-specific actions
     pub frame_data_count: usize,
 }
 
@@ -93,7 +94,7 @@ impl State {
             state_type,
             duration,
             can_cancel: false,
-            frame_data: [None; 32],
+            frame_data: [None; MAX_FRAME_DATA_PER_STATE],
             frame_data_count: 0,
         }
     }
@@ -105,7 +106,7 @@ impl State {
 
     /// Add frame data to this state
     pub fn add_frame_data(mut self, data: FrameData) -> Self {
-        if self.frame_data_count < 32 {
+        if self.frame_data_count < MAX_FRAME_DATA_PER_STATE {
             self.frame_data[self.frame_data_count] = Some(data);
             self.frame_data_count += 1;
         }
@@ -113,13 +114,13 @@ impl State {
     }
 
     /// Get actions for a specific frame
-    pub fn get_actions(&self, frame: u32) -> [Option<StateAction>; 8] {
-        let mut actions = [None; 8];
+    pub fn get_actions(&self, frame: u32) -> [Option<StateAction>; MAX_ACTIONS_PER_FRAME] {
+        let mut actions = [None; MAX_ACTIONS_PER_FRAME];
         let mut action_count = 0;
 
         for i in 0..self.frame_data_count {
             if let Some(data) = &self.frame_data[i] {
-                if data.frame == frame && action_count < 8 {
+                if data.frame == frame && action_count < MAX_ACTIONS_PER_FRAME {
                     actions[action_count] = Some(data.action);
                     action_count += 1;
                 }
@@ -134,7 +135,7 @@ impl State {
 pub struct StateMachine {
     current_state: StateId,
     state_frame: u32,        // Current frame within the state
-    states: [Option<State>; 32],
+    states: [Option<State>; MAX_STATES],
     state_count: usize,
 }
 
@@ -143,14 +144,14 @@ impl StateMachine {
         Self {
             current_state: StateId::Idle,
             state_frame: 0,
-            states: [None; 32],
+            states: [None; MAX_STATES],
             state_count: 0,
         }
     }
 
     /// Register a state
     pub fn register_state(&mut self, state: State) {
-        if self.state_count < 32 {
+        if self.state_count < MAX_STATES {
             self.states[self.state_count] = Some(state);
             self.state_count += 1;
         }
@@ -195,11 +196,11 @@ impl StateMachine {
     }
 
     /// Get actions for current frame
-    pub fn get_current_actions(&self) -> [Option<StateAction>; 8] {
+    pub fn get_current_actions(&self) -> [Option<StateAction>; MAX_ACTIONS_PER_FRAME] {
         if let Some(state) = self.find_state(self.current_state) {
             state.get_actions(self.state_frame)
         } else {
-            [None; 8]
+            [None; MAX_ACTIONS_PER_FRAME]
         }
     }
 
