@@ -230,6 +230,14 @@ pub mod states {
             .add_frame_data(FrameData::new(0, StateAction::SetVelocity { x: 300, y: 0 }))
     }
 
+    /// Create jump state
+    pub fn jump() -> State {
+        State::new(StateId::Jump, StateType::Normal, 30).add_frame_data(FrameData::new(
+            0,
+            StateAction::SetVelocity { x: 0, y: -300 },
+        ))
+    }
+
     /// Create basic light attack (fast, low damage)
     pub fn light_attack() -> State {
         State::new(StateId::LightAttack, StateType::Attack, 18)

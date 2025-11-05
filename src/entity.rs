@@ -137,6 +137,7 @@ impl Entity {
     fn register_default_states(&mut self) {
         self.state_machine.register_state(states::idle());
         self.state_machine.register_state(states::walk());
+        self.state_machine.register_state(states::jump());
         self.state_machine.register_state(states::light_attack());
         self.state_machine.register_state(states::medium_attack());
         self.state_machine.register_state(states::heavy_attack());
@@ -209,6 +210,16 @@ impl Entity {
 
         // Movement (can always move when not in stun)
         use crate::input::Direction;
+
+        // Jump if pressing up while on ground
+        if current.direction.is_up() && self.physics.on_ground {
+            let current_state = self.state_machine.current_state();
+            if current_state == StateId::Idle || current_state == StateId::Walk {
+                self.state_machine.transition(StateId::Jump);
+                return;
+            }
+        }
+
         match current.direction {
             Direction::Forward | Direction::DownForward | Direction::UpForward => {
                 if self.state_machine.current_state() == StateId::Idle {
