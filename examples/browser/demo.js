@@ -1,15 +1,11 @@
 // Bagarre Fighting Game Engine - Browser Demo
-// This demo shows how to use the WASM-compiled engine
-
-// Note: This is a demonstration. To actually run this, you need to:
-// 1. Compile to WASM: cargo build --target wasm32-unknown-unknown --release
-// 2. Use wasm-bindgen or load the WASM module directly
-// 3. Host with a local server (file:// won't work due to CORS)
+// This demo uses the actual WASM-compiled engine
 
 let wasmModule = null;
 let gameRunning = false;
 let paused = false;
 let frameInterval = null;
+let useWasm = true; // Set to false for simulation mode
 
 // Input state
 const p1Input = {
@@ -32,24 +28,30 @@ const STATE_NAMES = [
 // Initialize the game
 async function initGame() {
     try {
-        // For a real WASM build, you would load the module here:
-        // const wasm = await import('./bagarre.js');
-        // await wasm.default();
-        // wasm.init();
+        console.log('🥊 Initializing Bagarre...');
 
-        // For this demo, we'll simulate without actual WASM
-        console.log("WASM module would be loaded here");
-        document.getElementById('status').textContent = 'Ready! Use keyboard to fight!';
+        // Try to load WASM module
+        if (useWasm) {
+            wasmModule = new BagarreWasm();
+            await wasmModule.load('bagarre.wasm');
+            console.log('✅ WASM module loaded successfully');
+            document.getElementById('status').textContent = 'Ready! Use keyboard to fight!';
+        } else {
+            console.log('ℹ️ Running in simulation mode');
+            document.getElementById('status').textContent = 'Simulation Mode - Ready!';
+        }
 
         // Start the game loop
         startGame();
     } catch (err) {
-        document.getElementById('status').textContent = 'Error loading WASM: ' + err;
         console.error('Failed to load WASM:', err);
+        console.log('⚠️ Falling back to simulation mode');
 
-        // Continue with simulation for demonstration
+        // Fallback to simulation mode
+        useWasm = false;
+        wasmModule = null;
         document.getElementById('status').textContent =
-            'Running in simulation mode (compile to WASM for full functionality)';
+            'Running in simulation mode (WASM not available)';
         startGame();
     }
 }
@@ -101,8 +103,8 @@ function gameLoop() {
     const p1Encoded = encodeInput(p1Input);
     const p2Encoded = encodeInput(p2Input);
 
-    // Update game (if WASM is loaded)
-    if (wasmModule && wasmModule.tick) {
+    // Update game
+    if (useWasm && wasmModule) {
         wasmModule.tick(p1Encoded, p2Encoded);
         updateDisplay();
     } else {
@@ -210,33 +212,46 @@ function render() {
     ctx.stroke();
 
     // Get positions
-    let p1x = simP1X / 1000 + canvas.width / 2 - 100;
-    let p2x = simP2X / 1000 + canvas.width / 2 - 100;
+    let p1x, p2x, p1y, p2y;
     const groundY = canvas.height - 50;
+
+    if (useWasm && wasmModule) {
+        // Get real positions from WASM
+        p1x = wasmModule.get_p1_x() / 1000 + canvas.width / 2 - 20;
+        p2x = wasmModule.get_p2_x() / 1000 + canvas.width / 2 - 20;
+        p1y = groundY - (wasmModule.get_p1_y() / 1000);
+        p2y = groundY - (wasmModule.get_p2_y() / 1000);
+    } else {
+        // Use simulation positions
+        p1x = simP1X / 1000 + canvas.width / 2 - 100;
+        p2x = simP2X / 1000 + canvas.width / 2 - 100;
+        p1y = groundY;
+        p2y = groundY;
+    }
 
     // Draw player 1
     ctx.fillStyle = '#00ff00';
-    ctx.fillRect(p1x, groundY - 80, 40, 80);
+    ctx.fillRect(p1x, p1y - 80, 40, 80);
     ctx.fillStyle = '#00aa00';
-    ctx.fillRect(p1x + 10, groundY - 90, 20, 20); // Head
+    ctx.fillRect(p1x + 10, p1y - 90, 20, 20); // Head
 
     // Draw player 2
     ctx.fillStyle = '#ff0000';
-    ctx.fillRect(p2x, groundY - 80, 40, 80);
+    ctx.fillRect(p2x, p2y - 80, 40, 80);
     ctx.fillStyle = '#aa0000';
-    ctx.fillRect(p2x + 10, groundY - 90, 20, 20); // Head
+    ctx.fillRect(p2x + 10, p2y - 90, 20, 20); // Head
 
     // Draw attack indicators
     if (p1Input.light || p1Input.medium || p1Input.heavy) {
         ctx.strokeStyle = '#ffff00';
         ctx.lineWidth = 3;
-        ctx.strokeRect(p1x + 40, groundY - 60, 30, 20);
+        ctx.strokeRect(p1x + 40, p1y - 60, 30, 20);
     }
 
     if (p2Input.light || p2Input.medium || p2Input.heavy) {
         ctx.strokeStyle = '#ffff00';
         ctx.lineWidth = 3;
-        ctx.strokeRect(p2x - 30, groundY - 60, 30, 20);
+        ctx.strokeRect(p2x - 30, p2y - 60, 30, 20);
     }
 }
 
@@ -291,7 +306,7 @@ function handleKeyUp(e) {
 
 // UI controls
 function restartGame() {
-    if (wasmModule && wasmModule.init) {
+    if (useWasm && wasmModule) {
         wasmModule.init();
     }
     simFrame = 0;

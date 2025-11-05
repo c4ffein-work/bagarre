@@ -22,15 +22,18 @@ if [ -f "$WASM_FILE" ]; then
     SIZE=$(du -h "$WASM_FILE" | cut -f1)
     echo "✅ Build successful!"
     echo "📦 WASM file: $WASM_FILE ($SIZE)"
+
+    # Copy to browser demo directory
+    echo "📋 Copying to browser demo..."
+    mkdir -p examples/browser
+    cp "$WASM_FILE" examples/browser/bagarre.wasm
+
     echo ""
-    echo "To use in browser:"
-    echo "  1. Copy $WASM_FILE to your web directory"
-    echo "  2. Load it with WebAssembly.instantiateStreaming()"
-    echo "  3. See examples/browser/ for a demo"
+    echo "✅ WASM module ready at examples/browser/bagarre.wasm"
     echo ""
-    echo "Optional: Use wasm-bindgen for easier JS interop"
-    echo "  cargo install wasm-bindgen-cli"
-    echo "  wasm-bindgen $WASM_FILE --out-dir examples/browser --target web"
+    echo "To test locally:"
+    echo "  cd examples/browser && python3 -m http.server 8000"
+    echo "  Then open http://localhost:8000"
 else
     echo "❌ Build failed!"
     exit 1
