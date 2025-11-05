@@ -283,6 +283,7 @@ fn state_to_string(state: crate::state::StateId) -> &'static str {
     match state {
         StateId::Idle => "Idle",
         StateId::Walk => "Walk",
+        StateId::WalkBack => "WalkBack",
         StateId::Crouch => "Crouch",
         StateId::Jump => "Jump",
         StateId::LightAttack => "Light",

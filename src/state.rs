@@ -9,6 +9,7 @@ use crate::hitbox::AttackData;
 pub enum StateId {
     Idle,
     Walk,
+    WalkBack,
     Crouch,
     Jump,
     LightAttack,
@@ -228,6 +229,14 @@ pub mod states {
     pub fn walk() -> State {
         State::new(StateId::Walk, StateType::Normal, 1)
             .add_frame_data(FrameData::new(0, StateAction::SetVelocity { x: 300, y: 0 }))
+    }
+
+    /// Create walk back state (backward movement)
+    pub fn walk_back() -> State {
+        State::new(StateId::WalkBack, StateType::Normal, 1).add_frame_data(FrameData::new(
+            0,
+            StateAction::SetVelocity { x: -200, y: 0 },
+        ))
     }
 
     /// Create jump state
