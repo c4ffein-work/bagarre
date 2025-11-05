@@ -91,18 +91,31 @@ fn test_player1_movement_and_jump() {
     // Test jump - input the jump command
     println!("Testing jump...");
     let y_before_jump = p1_after_diagonal.y;
+    println!("P1 Y before jump: {}", y_before_jump);
 
     // Press up to jump
     engine.tick(input_with_direction(Direction::Up), InputState::neutral());
 
-    // Hold jump for a few frames
-    for _ in 0..3 {
-        engine.tick(input_with_direction(Direction::Up), InputState::neutral());
-    }
-
-    // Let gravity take over
-    for _ in 0..10 {
+    // Check Y during the jump (should be in the air)
+    for i in 0..8 {
         engine.tick(InputState::neutral(), InputState::neutral());
+
+        // Check Y position during jump
+        if i == 3 {
+            let p1_during_jump = engine
+                .get_player_entity(PlayerId::PLAYER_1)
+                .unwrap()
+                .physics
+                .position;
+            println!("P1 Y during jump (frame {}): {}", i, p1_during_jump.y);
+
+            // Y should be negative (in the air) during jump
+            // Ground is at Y=0, negative Y means airborne
+            assert!(
+                p1_during_jump.y < y_before_jump,
+                "P1 should be in the air during jump (Y should be negative/lower than ground)"
+            );
+        }
     }
 
     let p1_after_jump = engine
@@ -110,17 +123,7 @@ fn test_player1_movement_and_jump() {
         .unwrap()
         .physics
         .position;
-    println!(
-        "P1 after jump sequence: ({}, {})",
-        p1_after_jump.x, p1_after_jump.y
-    );
-
-    // The jump command was registered (Y may change or player may have velocity)
-    // This is a naive test - we just verify the engine handles jump input without crashing
-    println!(
-        "Jump input processed (Y: {} -> {})",
-        y_before_jump, p1_after_jump.y
-    );
+    println!("P1 Y after jump sequence: {}", p1_after_jump.y);
 
     println!("✓ Player 1 movement and jump test passed!");
 }
@@ -201,18 +204,31 @@ fn test_player2_movement_and_jump() {
     // Test jump - input the jump command
     println!("Testing jump...");
     let y_before_jump = p2_after_diagonal.y;
+    println!("P2 Y before jump: {}", y_before_jump);
 
     // Press up to jump
     engine.tick(InputState::neutral(), input_with_direction(Direction::Up));
 
-    // Hold jump for a few frames
-    for _ in 0..3 {
-        engine.tick(InputState::neutral(), input_with_direction(Direction::Up));
-    }
-
-    // Let gravity take over
-    for _ in 0..10 {
+    // Check Y during the jump (should be in the air)
+    for i in 0..8 {
         engine.tick(InputState::neutral(), InputState::neutral());
+
+        // Check Y position during jump
+        if i == 3 {
+            let p2_during_jump = engine
+                .get_player_entity(PlayerId::PLAYER_2)
+                .unwrap()
+                .physics
+                .position;
+            println!("P2 Y during jump (frame {}): {}", i, p2_during_jump.y);
+
+            // Y should be negative (in the air) during jump
+            // Ground is at Y=0, negative Y means airborne
+            assert!(
+                p2_during_jump.y < y_before_jump,
+                "P2 should be in the air during jump (Y should be negative/lower than ground)"
+            );
+        }
     }
 
     let p2_after_jump = engine
@@ -220,17 +236,7 @@ fn test_player2_movement_and_jump() {
         .unwrap()
         .physics
         .position;
-    println!(
-        "P2 after jump sequence: ({}, {})",
-        p2_after_jump.x, p2_after_jump.y
-    );
-
-    // The jump command was registered (Y may change or player may have velocity)
-    // This is a naive test - we just verify the engine handles jump input without crashing
-    println!(
-        "Jump input processed (Y: {} -> {})",
-        y_before_jump, p2_after_jump.y
-    );
+    println!("P2 Y after jump sequence: {}", p2_after_jump.y);
 
     println!("✓ Player 2 movement and jump test passed!");
 }
