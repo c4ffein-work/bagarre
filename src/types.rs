@@ -1,5 +1,5 @@
-/// Core types for the Bagarre fighting game engine
-/// Zero dependencies - all implementations are custom
+//! Core types for the Bagarre fighting game engine
+//! Zero dependencies - all implementations are custom
 
 /// A 2D vector for positions, velocities, and other 2D quantities.
 ///
@@ -167,7 +167,12 @@ impl Rect {
     /// assert_eq!(rect.width, 50);
     /// ```
     pub const fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     /// Creates a rectangle from a center point and dimensions.
@@ -221,10 +226,7 @@ impl Rect {
     /// assert_eq!(rect.center(), Vec2::new(5, 10));
     /// ```
     pub fn center(&self) -> Vec2 {
-        Vec2::new(
-            self.x + self.width / 2,
-            self.y + self.height / 2,
-        )
+        Vec2::new(self.x + self.width / 2, self.y + self.height / 2)
     }
 
     /// Tests if this rectangle intersects with another using AABB collision detection.
@@ -242,10 +244,10 @@ impl Rect {
     /// assert!(!r1.intersects(&r3));
     /// ```
     pub fn intersects(&self, other: &Rect) -> bool {
-        self.left() < other.right() &&
-        self.right() > other.left() &&
-        self.top() < other.bottom() &&
-        self.bottom() > other.top()
+        self.left() < other.right()
+            && self.right() > other.left()
+            && self.top() < other.bottom()
+            && self.bottom() > other.top()
     }
 }
 

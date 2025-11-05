@@ -6,8 +6,8 @@
 //! To use with wasm-bindgen (recommended), enable it in Cargo.toml
 
 use crate::engine::{Engine, GameResult};
-use crate::input::{InputState, Direction, Button};
-use crate::types::{PlayerId, Facing};
+use crate::input::{Button, Direction, InputState};
+use crate::types::{Facing, PlayerId};
 
 /// Global engine instance for WASM
 static mut ENGINE: Option<Engine> = None;
@@ -43,16 +43,15 @@ pub extern "C" fn tick(p1_input: u32, p2_input: u32) {
 /// Get current frame number
 #[no_mangle]
 pub extern "C" fn get_frame() -> u64 {
-    unsafe {
-        ENGINE.as_ref().map(|e| e.frame.0).unwrap_or(0)
-    }
+    unsafe { ENGINE.as_ref().map(|e| e.frame.0).unwrap_or(0) }
 }
 
 /// Get player 1 position X
 #[no_mangle]
 pub extern "C" fn get_p1_x() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_1))
             .map(|p| p.physics.position.x)
             .unwrap_or(0)
@@ -63,7 +62,8 @@ pub extern "C" fn get_p1_x() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p1_y() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_1))
             .map(|p| p.physics.position.y)
             .unwrap_or(0)
@@ -74,7 +74,8 @@ pub extern "C" fn get_p1_y() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p1_health() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_1))
             .map(|p| p.health.current)
             .unwrap_or(0)
@@ -85,7 +86,8 @@ pub extern "C" fn get_p1_health() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p1_state() -> u32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_1))
             .map(|p| encode_state(p.state_machine.current_state()))
             .unwrap_or(0)
@@ -96,7 +98,8 @@ pub extern "C" fn get_p1_state() -> u32 {
 #[no_mangle]
 pub extern "C" fn get_p1_facing() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_1))
             .map(|p| p.facing.sign())
             .unwrap_or(1)
@@ -107,7 +110,8 @@ pub extern "C" fn get_p1_facing() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p2_x() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_2))
             .map(|p| p.physics.position.x)
             .unwrap_or(0)
@@ -118,7 +122,8 @@ pub extern "C" fn get_p2_x() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p2_y() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_2))
             .map(|p| p.physics.position.y)
             .unwrap_or(0)
@@ -129,7 +134,8 @@ pub extern "C" fn get_p2_y() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p2_health() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_2))
             .map(|p| p.health.current)
             .unwrap_or(0)
@@ -140,7 +146,8 @@ pub extern "C" fn get_p2_health() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_p2_state() -> u32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_2))
             .map(|p| encode_state(p.state_machine.current_state()))
             .unwrap_or(0)
@@ -151,7 +158,8 @@ pub extern "C" fn get_p2_state() -> u32 {
 #[no_mangle]
 pub extern "C" fn get_p2_facing() -> i32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .and_then(|e| e.get_player_entity(PlayerId::PLAYER_2))
             .map(|p| p.facing.sign())
             .unwrap_or(-1)
@@ -162,7 +170,8 @@ pub extern "C" fn get_p2_facing() -> i32 {
 #[no_mangle]
 pub extern "C" fn get_result() -> u32 {
     unsafe {
-        ENGINE.as_ref()
+        ENGINE
+            .as_ref()
             .map(|e| match e.game_result {
                 GameResult::InProgress => 0,
                 GameResult::Player1Wins => 1,

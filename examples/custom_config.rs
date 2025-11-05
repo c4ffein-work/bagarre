@@ -2,10 +2,8 @@
 ///
 /// This example demonstrates how to create custom game configurations
 /// to tune physics, input handling, and game rules.
-
 use bagarre::{
-    Engine, InputState, PhysicsConfig, InputConfig, GameConfig, EngineConfig,
-    GameResult,
+    Engine, EngineConfig, GameConfig, GameResult, InputConfig, InputState, PhysicsConfig,
 };
 
 fn main() {
@@ -38,20 +36,32 @@ fn demonstrate_presets() {
     // Casual mode: Lenient inputs, lower health, shorter rounds
     let casual = EngineConfig::casual();
     println!("  Casual Mode:");
-    println!("    - Detection window: {} frames", casual.input.detection_window);
+    println!(
+        "    - Detection window: {} frames",
+        casual.input.detection_window
+    );
     println!("    - Starting health: {}", casual.game.starting_health);
     println!("    - Rounds to win: {}", casual.game.rounds_to_win);
 
     // Competitive mode: Strict inputs, standard rules
     let competitive = EngineConfig::competitive();
     println!("  Competitive Mode:");
-    println!("    - Detection window: {} frames", competitive.input.detection_window);
-    println!("    - Starting health: {}", competitive.game.starting_health);
+    println!(
+        "    - Detection window: {} frames",
+        competitive.input.detection_window
+    );
+    println!(
+        "    - Starting health: {}",
+        competitive.game.starting_health
+    );
 
     // Training mode: No time limit, very high health
     let training = EngineConfig::training();
     println!("  Training Mode:");
-    println!("    - Time limit: {} (infinite)", training.game.time_limit_frames);
+    println!(
+        "    - Time limit: {} (infinite)",
+        training.game.time_limit_frames
+    );
     println!("    - Starting health: {}", training.game.starting_health);
 }
 
@@ -104,9 +114,11 @@ fn demonstrate_custom_rules() {
 
     println!("  Quick Match:");
     println!("    - Health: {}", quick.starting_health);
-    println!("    - Time: {} frames ({} seconds)",
-             quick.time_limit_frames,
-             quick.time_limit_frames / 60);
+    println!(
+        "    - Time: {} frames ({} seconds)",
+        quick.time_limit_frames,
+        quick.time_limit_frames / 60
+    );
     println!("    - Rounds: Best of {}", quick.rounds_to_win);
 
     // Create an extended match configuration
@@ -133,7 +145,10 @@ fn demonstrate_complete_custom() {
     println!("    - High gravity with lenient inputs");
     println!("    - Health: {}", config.game.starting_health);
     println!("    - Time: {} seconds", config.game.time_limit_frames / 60);
-    println!("    - Input window: {} frames", config.input.detection_window);
+    println!(
+        "    - Input window: {} frames",
+        config.input.detection_window
+    );
 
     // Note: In the current engine implementation, configs are for reference only.
     // A future version would allow passing config to Engine::new() to apply these settings.

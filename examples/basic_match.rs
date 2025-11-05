@@ -2,10 +2,7 @@
 ///
 /// This example demonstrates how to set up and run a basic fighting game match
 /// using the Bagarre engine.
-
-use bagarre::{
-    Engine, InputState, Direction, GameResult, PlayerId,
-};
+use bagarre::{Direction, Engine, GameResult, InputState, PlayerId};
 
 fn main() {
     println!("=== Bagarre Fighting Game Engine - Basic Match Example ===\n");
@@ -22,10 +19,22 @@ fn main() {
     engine.init_match();
 
     println!("Match initialized!");
-    println!("Player 1: Starting Health = {}",
-             engine.get_player_entity(PlayerId::PLAYER_1).unwrap().health.current);
-    println!("Player 2: Starting Health = {}\n",
-             engine.get_player_entity(PlayerId::PLAYER_2).unwrap().health.current);
+    println!(
+        "Player 1: Starting Health = {}",
+        engine
+            .get_player_entity(PlayerId::PLAYER_1)
+            .unwrap()
+            .health
+            .current
+    );
+    println!(
+        "Player 2: Starting Health = {}\n",
+        engine
+            .get_player_entity(PlayerId::PLAYER_2)
+            .unwrap()
+            .health
+            .current
+    );
 
     // Simulate a fighting game match
     let mut frame = 0;
@@ -46,15 +55,19 @@ fn main() {
 
         // Print status every 60 frames (1 second)
         if frame % 60 == 0 {
-            let p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+            let p1_health = engine
+                .get_player_entity(PlayerId::PLAYER_1)
                 .map(|e| e.health.current)
                 .unwrap_or(0);
-            let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+            let p2_health = engine
+                .get_player_entity(PlayerId::PLAYER_2)
                 .map(|e| e.health.current)
                 .unwrap_or(0);
 
-            println!("Frame {}: P1 Health: {} | P2 Health: {}",
-                     state.frame, p1_health, p2_health);
+            println!(
+                "Frame {}: P1 Health: {} | P2 Health: {}",
+                state.frame, p1_health, p2_health
+            );
         }
 
         // Check for match end
@@ -68,10 +81,12 @@ fn main() {
 
     if frame >= max_frames {
         println!("\n=== TIME OUT ===");
-        let p1_health = engine.get_player_entity(PlayerId::PLAYER_1)
+        let p1_health = engine
+            .get_player_entity(PlayerId::PLAYER_1)
             .map(|e| e.health.current)
             .unwrap_or(0);
-        let p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        let p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
             .map(|e| e.health.current)
             .unwrap_or(0);
 

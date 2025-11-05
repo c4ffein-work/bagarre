@@ -1,7 +1,7 @@
-/// Constants for the Bagarre fighting game engine
-///
-/// This module contains all configuration constants used throughout the engine.
-/// Modifying these values allows tuning of game physics, timing, and limits.
+//! Constants for the Bagarre fighting game engine
+//!
+//! This module contains all configuration constants used throughout the engine.
+//! Modifying these values allows tuning of game physics, timing, and limits.
 
 // =============================================================================
 // Physics Constants

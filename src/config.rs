@@ -1,8 +1,8 @@
-/// Configuration system for customizing game physics and parameters
-///
-/// This module provides runtime configuration for various engine parameters.
-/// By default, all values are set to match the constants, but can be customized
-/// per-game or per-character.
+//! Configuration system for customizing game physics and parameters
+//!
+//! This module provides runtime configuration for various engine parameters.
+//! By default, all values are set to match the constants, but can be customized
+//! per-game or per-character.
 
 use crate::constants::*;
 
@@ -177,7 +177,7 @@ impl GameConfig {
 }
 
 /// Complete engine configuration
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct EngineConfig {
     /// Physics parameters
     pub physics: PhysicsConfig,
@@ -185,16 +185,6 @@ pub struct EngineConfig {
     pub input: InputConfig,
     /// Game rules
     pub game: GameConfig,
-}
-
-impl Default for EngineConfig {
-    fn default() -> Self {
-        Self {
-            physics: PhysicsConfig::default(),
-            input: InputConfig::default(),
-            game: GameConfig::default(),
-        }
-    }
 }
 
 impl EngineConfig {

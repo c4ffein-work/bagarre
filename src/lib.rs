@@ -25,7 +25,7 @@
 //!
 //! ## Example
 //!
-//! ```rust
+//! ```rust,no_run
 //! use bagarre::{Engine, InputState};
 //!
 //! let mut engine = Engine::new();
@@ -47,24 +47,24 @@
 //! }
 //! ```
 
-pub mod constants;
 pub mod config;
-pub mod types;
+pub mod constants;
+pub mod engine;
+pub mod entity;
 pub mod hitbox;
 pub mod input;
 pub mod state;
-pub mod entity;
-pub mod engine;
+pub mod types;
 
 #[cfg(target_arch = "wasm32")]
 pub mod wasm;
 
 // Re-export main types for convenience
+pub use config::{EngineConfig, GameConfig, InputConfig, PhysicsConfig};
 pub use engine::{Engine, GameResult, GameState};
-pub use input::{InputState, Direction, Button};
-pub use types::{Vec2, Facing, EntityId, PlayerId};
+pub use input::{Button, Direction, InputState};
 pub use state::StateId;
-pub use config::{EngineConfig, PhysicsConfig, InputConfig, GameConfig};
+pub use types::{EntityId, Facing, PlayerId, Vec2};
 
 #[cfg(test)]
 mod integration_tests {
@@ -91,9 +91,11 @@ mod integration_tests {
         let mut engine = Engine::new();
         engine.init_match();
 
-        let initial_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        let initial_p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
             .unwrap()
-            .health.current;
+            .health
+            .current;
 
         // Player 1 does light attack
         let mut p1_input = InputState::neutral();
@@ -109,9 +111,11 @@ mod integration_tests {
         }
 
         // Check if damage was dealt
-        let final_p2_health = engine.get_player_entity(PlayerId::PLAYER_2)
+        let final_p2_health = engine
+            .get_player_entity(PlayerId::PLAYER_2)
             .unwrap()
-            .health.current;
+            .health
+            .current;
 
         // Note: This test may not always work depending on spacing
         // In a real game, we'd position entities to guarantee hit
@@ -228,7 +232,7 @@ mod integration_tests {
 
     #[test]
     fn test_state_machine_auto_transition() {
-        use state::{StateMachine, states};
+        use state::{states, StateMachine};
 
         let mut sm = StateMachine::new();
         sm.register_state(states::light_attack());
@@ -247,7 +251,7 @@ mod integration_tests {
 
     #[test]
     fn test_collision_at_boundaries() {
-        use hitbox::{CollisionSystem, CollisionBox, AttackData};
+        use hitbox::{AttackData, CollisionBox, CollisionSystem};
 
         let mut system = CollisionSystem::new();
 
@@ -277,7 +281,7 @@ mod integration_tests {
 
     #[test]
     fn test_multiple_hits_same_frame() {
-        use hitbox::{CollisionSystem, CollisionBox, AttackData};
+        use hitbox::{AttackData, CollisionBox, CollisionSystem};
 
         let mut system = CollisionSystem::new();
 
@@ -295,10 +299,7 @@ mod integration_tests {
         }
 
         // Single hurtbox that overlaps all hitboxes
-        let hurtbox = CollisionBox::hurtbox(
-            defender_id,
-            types::Rect::new(5, 5, 20, 20),
-        );
+        let hurtbox = CollisionBox::hurtbox(defender_id, types::Rect::new(5, 5, 20, 20));
         system.add_hurtbox(hurtbox);
 
         let results = system.check_collisions();
